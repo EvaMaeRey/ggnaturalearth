@@ -4,27 +4,27 @@
 #'
 #' @param data
 #' @param scales
-#' @param keep_county
+#' @param keep_country
 #'
 #' @return
 #' @export
 #'
 #' @examples
 #' library(dplyr)
-#' #northcarolina_flat |> rename(fips = FIPS) |> compute_county_northcarolina() |> head()
-#' #northcarolina_flat |> rename(fips = FIPS) |> compute_county_northcarolina(keep_county = "Ashe")
-compute_county_northcarolina <- function(data, scales, keep_county = NULL){
+#' #northcarolina_flat |> rename(fips = FIPS) |> compute_country_northcarolina() |> head()
+#' #northcarolina_flat |> rename(fips = FIPS) |> compute_country_northcarolina(keep_country = "Ashe")
+compute_country_ne <- function(data, scales, keep_country = NULL){
 
-  reference_filtered <- northcarolina_county_reference
+  reference_filtered <- ne_countries_reference
   #
-  if(!is.null(keep_county)){
+  if(!is.null(keep_country)){
 
-    keep_county %>% tolower() -> keep_county
+    keep_country %>% tolower() -> keep_country
 
     reference_filtered %>%
-      dplyr::filter(.data$county_name %>%
+      dplyr::filter(.data$country_name %>%
                       tolower() %in%
-                      keep_county) ->
+                      keep_country) ->
       reference_filtered
 
   }
@@ -50,10 +50,10 @@ compute_county_northcarolina <- function(data, scales, keep_county = NULL){
 
 ###### Step 2. Specify ggproto ###############
 
-StatCountynorthcarolina <- ggplot2::ggproto(
-  `_class` = "StatCountynorthcarolina",
+StatCountryne <- ggplot2::ggproto(
+  `_class` = "StatCountryne",
   `_inherit` = ggplot2::Stat,
-  compute_panel = compute_county_northcarolina,
+  compute_panel = compute_country_ne,
   default_aes = ggplot2::aes(geometry = ggplot2::after_stat(geometry)))
 
 
@@ -73,7 +73,7 @@ StatCountynorthcarolina <- ggplot2::ggproto(
 #' @export
 #'
 #' @examples
-geom_county <- function(
+geom_country <- function(
       mapping = NULL,
       data = NULL,
       position = "identity",
@@ -83,7 +83,7 @@ geom_county <- function(
       crs = "NAD27", # "NAD27", 5070, "WGS84", "NAD83", 4326 , 3857
       ...) {
             c(ggplot2::layer_sf(
-              stat = StatCountynorthcarolina,  # proto object from step 2
+              stat = StatCountryne,  # proto object from step 2
               geom = ggplot2::GeomSf,  # inherit other behavior
               data = data,
               mapping = mapping,

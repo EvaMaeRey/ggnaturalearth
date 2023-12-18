@@ -6,39 +6,39 @@
 #'
 #' @param data
 #' @param scales
-#' @param keep_county
+#' @param keep_country
 #'
 #' @return
 #' @export
 #'
 #' @examples
-compute_panel_county_centers <- function(data,
+compute_panel_country_centers <- function(data,
                                          scales,
-                                         keep_county = NULL){
+                                         keep_country = NULL){
 
-  northcarolina_county_centers_filtered <- northcarolina_county_centers
+  ne_country_centers_filtered <- ne_country_centers
 
-  if(!is.null(keep_county)){
-    keep_county %>% tolower() -> keep_county
+  if(!is.null(keep_country)){
+    keep_country %>% tolower() -> keep_country
 
-    northcarolina_county_centers_filtered %>%
-      dplyr::filter(.data$county_name %>%
+    ne_country_centers_filtered %>%
+      dplyr::filter(.data$country_name %>%
                       tolower() %in%
-                      keep_county) ->
-      northcarolina_county_centers_filtered}
+                      keep_country) ->
+      ne_country_centers_filtered}
 
   data %>%
-    dplyr::inner_join(northcarolina_county_centers_filtered) %>%
+    dplyr::inner_join(ne_country_centers_filtered) %>%
     dplyr::select(x, y, label)
 
 }
 
 ###### Step 2. Specify ggproto ###############
-StatCountycenters <- ggplot2::ggproto(
-  `_class` = "StatRownumber",
+StatCountrycenters <- ggplot2::ggproto(
+  `_class` = "StatCountrycenters",
   `_inherit` = ggplot2::Stat,
   # required_aes = c("label"), # for some reason this breaks things... why?
-  compute_panel = compute_panel_county_centers
+  compute_panel = compute_panel_country_centers
 )
 
 
@@ -58,7 +58,7 @@ StatCountycenters <- ggplot2::ggproto(
 #' @export
 #'
 #' @examples
-geom_county_label <- function(
+geom_country_label <- function(
   mapping = NULL,
   data = NULL,
   position = "identity",
@@ -66,7 +66,7 @@ geom_county_label <- function(
   show.legend = NA,
   inherit.aes = TRUE, ...) {
   ggplot2::layer(
-    stat = StatCountycenters,  # proto object from Step 2
+    stat = StatCountrycenters,  # proto object from Step 2
     geom = ggplot2::GeomText,  # inherit other behavior
     data = data,
     mapping = mapping,
